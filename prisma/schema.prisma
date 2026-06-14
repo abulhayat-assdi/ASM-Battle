@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  MANAGER
+  VIEWER
+}
+
+model AdminUser {
+  id        String    @id @default(cuid())
+  username  String    @unique
+  name      String
+  password  String // bcrypt hash
+  role      AdminRole @default(VIEWER)
+  createdAt DateTime  @default(now())
+}
+
+// Optional registry of teams. Reports also store a free-text team name so the
+// system works even before a team is formally added here.
+model Team {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model IndividualReport {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Section 1 — Basic Info
+  name     String
+  teamName String
+  date     DateTime
+  role     String
+
+  // Section 2 — Numbers
+  approached    Int
+  purchased     Int
+  salesAmount   Float
+  profit        Float
+
+  // Section 3 — Learning
+  bestPitch        String
+  hardestObjection String
+  objectionHandled String
+  saleOutcome      String
+
+  // Section 4 — Reflection
+  selfRating     Int
+  biggestMistake String
+  tomorrowChange String
+
+  // Section 5 — Team Pulse (optional)
+  teamBestWork String?
+  teamIssues   String[] @default([])
+
+  @@index([teamName])
+  @@index([date])
+}
+
+model TeamReport {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  teamName    String
+  date        DateTime
+  captain     String
+  allPresent  String
+  whoAbsent   String?
+  approached  Int
+  purchased   Int
+  conversion  String?
+  totalSales  Float
+  totalProfit Float
+  cumulativeProfit Float?
+  topPerformer String
+  mostStruggled String
+  bestApproach String
+  bestArea     String
+  commonObjection String
+  objectionHandled String
+  tomorrowStrategy String
+  memberHelp   String?
+
+  @@index([teamName])
+  @@index([date])
+}
